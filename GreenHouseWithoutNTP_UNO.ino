@@ -162,6 +162,8 @@ void loop() {
     digitalWrite(LEDpin, !digitalRead(LEDpin));
   }
 
+  receiveRPiData();
+
   // check to see if it's time to water
   waterPots();
 

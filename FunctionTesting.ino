@@ -15,23 +15,26 @@ void checkSensorPresence(void){
 
 void receiveRPiData(void){
   int inCount = Serial.available();
-  if (inCount < 4) { return;}     //return if less than 4 bytes are avaialable
-  if (inCount > 4) { Serial.write(" Input Buffer Overflow in function receiveData()"); Serial.println("");
+  if (inCount < 8) { return;}     //return if less than 4 bytes are avaialable
+  if (inCount > 8) { Serial.write(" Input Buffer Overflow in function receiveData()"); Serial.println("");
     // must deal with buffer overrun
   }
-  if (inCount == 4){    // read and store the buffr contents
-      for (int i=0; i < 4; i++){
+  if (inCount == 8){    // read and store the buffr contents
+      for (int i=0; i < 8; i++){
       RPirecBlock[i]=Serial.read();
-      calcCRC = crc8(RPirecBlock, 3);
+      //calcCRC = crc8(RPirecBlock, 3);
       }
  
-  if ((RPirecBlock[3]) != calcCRC){     // check CRC8
-    Serial.write("CRC FAILED in function receiveData()");
-    Serial.println("");
-    crcFAIL = true;
+  //if ((RPirecBlock[3]) != calcCRC){     // check CRC8
+    //Serial.write("CRC FAILED in function receiveData()");
+    //Serial.println("");
+    //crcFAIL = true;
     // request data to be resent
-    }
+    //}
   }
+  UTC_hours = RPirecBlock[1];
+  UTC_minutes = RPirecBlock[3];
+  UTC_seconds = RPirecBlock[5];
 }
 
 void decodeRPiData(){
