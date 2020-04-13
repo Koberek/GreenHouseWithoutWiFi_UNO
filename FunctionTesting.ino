@@ -14,32 +14,36 @@ void checkSensorPresence(void){
 // If the CRC8 fails set crcFAIL to TRUE
 
 void receiveRPiData(void){
+  
   int inCount = Serial.available();
-  if (inCount < 8) { return;}     //return if less than 4 bytes are avaialable
-  if (inCount > 8) { Serial.write(" Input Buffer Overflow in function receiveData()"); Serial.println("");
-    // must deal with buffer overrun
+  
+  if (inCount < 6) {
+    return;
+    }     //return if less than 4 bytes are avaialable
+  
+  if (inCount > 6) { 
+    Serial.println("Input Buffer Overflow in function receiveRPiData()");
+    // flush the input buffer
+    while (Serial.available()) {
+      Serial.read();
+    }
+    return;
   }
-  if (inCount == 8){    // read and store the buffr contents
-      for (int i=0; i < 8; i++){
+  
+  if (inCount == 6){    // read and store the buffr contents
+      for (int i=0; i < 6; i++){
       RPirecBlock[i]=Serial.read();
-      //calcCRC = crc8(RPirecBlock, 3);
       }
- 
-  //if ((RPirecBlock[3]) != calcCRC){     // check CRC8
-    //Serial.write("CRC FAILED in function receiveData()");
-    //Serial.println("");
-    //crcFAIL = true;
-    // request data to be resent
-    //}
   }
-  UTC_hours = RPirecBlock[1];
-  UTC_minutes = RPirecBlock[3];
-  UTC_seconds = RPirecBlock[5];
+      
+  if ((RPirecBlock[0] == 72) && (RPirecBlock[2] == 77) && (RPirecBlock[4] == 83)) {
+    // DATA block received verified. Adjust time
+    UTC_hours   = RPirecBlock[1];
+    UTC_minutes = RPirecBlock[3];
+    UTC_seconds = RPirecBlock[5];      
+  }
 }
 
-void decodeRPiData(){
-  // create decode strategy
-  }
 
 
 void getTempsF(void){
@@ -53,84 +57,80 @@ void getTempsF(void){
 }
 
 void controlHouseVent(void){
-  int houseTemp   = greenHouseTemperatures[6];
+  int houseTemp   = greenHouseTemperatures[0];
   if (houseTemp >= houseVentOnTemp){
     digitalWrite(heatPin1, OFF);
     digitalWrite(heatPin2, OFF);
     digitalWrite(ventPin, ON);
+    ventON = true;
   }
   if (houseTemp <= houseVentOffTemp){
     digitalWrite(ventPin, OFF);
+    ventON = false;
   }
 }
 
 void controlHouseHeater(void){
-  int houseTemp   = greenHouseTemperatures[6];
+  int houseTemp   = greenHouseTemperatures[0];
   if (houseTemp <= houseHeatOnTemp){
     digitalWrite(ventPin, OFF);
     digitalWrite(heatPin1, ON);
     digitalWrite(heatPin2, ON);
+    heaterON = true;
   }
   if (houseTemp >= houseHeatOffTemp){
     digitalWrite(heatPin1, OFF);
     digitalWrite(heatPin2, OFF);
+    heaterON = false;
   }
 }
 
 
 void waterPots(void){
-
-        
-        // Check if NTP returned a valid time
-    if (UTC_hours >= 24) {return;}  // 24 is an invalid UTC value. UTC_hours was init to 25 so nothing is done until a valid time received
-                                    // so no action until after the first successful getNTPtime()
                                    
-        // check if UTC time matches first preset watering time
-    if (waterON == false){          // check schedule if the waterON = false. If true then moving on..........
-      if ((UTC_hours == waterSchedule[firstWatering]) && (UTC_minutes == 0)){
-        waterON = true;
-        WATER_int = 120000;             // first watering 6am is for 2 minutes
+        // check if UTC time matches  preset watering time in waterSchedule[0,1]
+    if (waterON == false){              // waterON = false if watering hasn't already been turned on
+      if ((UTC_hours == waterSchedule[0]) && (UTC_minutes == waterSchedule[1])){
+        waterON = true;                 // waterON = time to water. Doesn't mean that watering is active
+        WATER_int = 60000;             // set 1 minute to water plants if schedule waterSchedule[0,1]
       }
     }
-        // check if UTC time matches second preset watering time
+        // check if UTC time matches preset watering time in waterSchedule[2,3]
     if (waterON == false){
-      if ((UTC_hours == waterSchedule[secondWatering]) && (UTC_minutes == 0)){
+      if ((UTC_hours == waterSchedule[2]) && (UTC_minutes == waterSchedule[3])){
         waterON = true;
-        WATER_int = 60000;              // second watering 2pm is for 1 minute
+        WATER_int = 120000;              // set 2 minute to water plants if schedule waterSchedule[2,3]
       }
     }
     
-    if ((waterON == true) && (wateringON == false)){        //waterON if inside watering window 
-        wateringON = true;                                  // wateringON is true is watering is active
-          digitalWrite(pot1pin, ON);
+    if ((waterON == true) && (wateringON == false)){        //waterON if inside watering window and wateringON is not active
+        wateringON = true;                                  // wateringON is true when  watering is active
+          digitalWrite(pot1pin, ON);                        // turn watering valves ON
           digitalWrite(pot2pin, ON);
           digitalWrite(pot3pin, ON);
           digitalWrite(pot4pin, ON);
-          digitalWrite(pot5pin, ON);
+          
           
         WATER_lastRead_millis = millis();                   // init the wateringON timer start value
       }
 
-    if ((waterON == true) && (wateringON == true)){
+    if ((waterON == true) && (wateringON == true)){         // if already watering (valves ON)
       
-      bool endwatering = timer_lapsed(WATER);               // endwatering true is the watering time has expired
+      bool endwatering = timer_lapsed(WATER);               // endwatering true when watering time has expired
       if (endwatering == true){
         waterON = false;                                    // reset the waterON to false
-        wateringON = false;                                 // 
+        wateringON = false;                                 // turn off watering
           digitalWrite(pot1pin, OFF);
           digitalWrite(pot2pin, OFF);
           digitalWrite(pot3pin, OFF);
           digitalWrite(pot4pin, OFF);
-          digitalWrite(pot5pin, OFF);
+          
       }
     }
 }
 
 void printData(void){
-  Serial.print("UTC time is:  ");
-    if ((UTC_hours >= 24) || (UTC_minutes >= 60)){
-      Serial.println("  INVALID TIME STAMP:");
-    }
+  Serial.print("TIME:  ");
   Serial.print(UTC_hours);
   Serial.print(':');
   if (UTC_minutes < 10) {
@@ -140,10 +140,19 @@ void printData(void){
   Serial.println(UTC_minutes);
 
   if (wateringON == true){
-    Serial.println("Watering is ACTIVE");
+    Serial.println("Watering is ON");
   }
-    else Serial.println("Watering in INACTIVE");
-  
+  else Serial.println("Watering is OFF");
+
+  if (ventON == true){
+    Serial.println("Venting  is ON");  
+  }
+  else Serial.println("Venting  is OFF");
+
+  if (heaterON == true) {
+    Serial.print("Heater   is ON..");
+    }
+  else Serial.println("Heater   is OFF..");  
     
   // print the temperatures
   for (int i=0; i<9; i++){

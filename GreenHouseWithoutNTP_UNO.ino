@@ -9,9 +9,9 @@
 //************************************************************************************************************
 // PINS>
 // 3,4    Heater (parallel circuit)
-// 6      Vent
+// 5      Vent
 // A0-A4  Water pots 1-5
-// A5     RUN LED
+// 13     RUN LED
 //*************************************************************************************************************
 
 //************************************************************************************************************
@@ -39,13 +39,12 @@
 #define ONE_WIRE_BUS 2                 // OneWire connected to pin2 on Uno
 #define TEMPERATURE_PRECISION 12       //Set precision of the 18B20's
 
-#define pot1pin   A0                   // analog pin A0
+#define pot1pin   A0                   
 #define pot2pin   A1
 #define pot3pin   A2
 #define pot4pin   A3
-#define pot5pin   A4
-#define runPin    A5
-#define ventPin   6
+#define pot5pin   A4                  // not used
+#define ventPin   5
 #define heatPin1  3
 #define heatPin2  4
 #define LEDpin    13
@@ -75,11 +74,11 @@ int UTC_minutes = 65;                    // same as above
 int UTC_seconds = 0;                     //
 
 
-int waterSchedule[]   {6, 14};           // 24 hour clock. 6am and 2pm. Minutes are always 0 in waterPots()
-int firstWatering   = 0;                 // index to waterSchedule[]
-int secondWatering  = 1;
+int waterSchedule[]   {6,0,18,55};       // 24 hour clock. 0600 and 1400. Minutes are always 0 in waterPots()
 bool wateringON     = false;             // true if watering is active... i.e. water valves are open
 bool waterON        = false;             // true if it is time to water
+bool heaterON       = false;
+bool ventON         = false;
 
 bool  crcFAIL = false;                  // CRC used in serial communication with RPi.  NOT USED currently
 
@@ -100,11 +99,11 @@ OneWire oneWire(ONE_WIRE_BUS);            // create OneWire instance on pin2
 DallasTemperature sensors(&oneWire);      // pass onewire instance to Dallas
 
 // These are the ID's of the 5-probe temperature probe assembly (pre-made assembly  fixed addresses) and 4 extra probes
-DeviceAddress probe1 = { 0x28, 0xFF, 0xC3, 0x0D, 0x81, 0x14, 0x02, 0x1B };
-DeviceAddress probe2 = { 0x28, 0xFF, 0x7D, 0x65, 0x81, 0x14, 0x02, 0x7A };
-DeviceAddress probe3 = { 0x28, 0xFF, 0xD2, 0x5C, 0x30, 0x17, 0x04, 0x62 };
-DeviceAddress probe4 = { 0x28, 0xFF, 0xDB, 0x57, 0x81, 0x14, 0x02, 0x9A };
-DeviceAddress probe5 = { 0x28, 0xFF, 0x7B, 0xF6, 0x80, 0x14, 0x02, 0x24 };
+DeviceAddress probe1 = { 0x28, 0xFF, 0xC3, 0x0D, 0x81, 0x14, 0x02, 0x1B };    // for Greenhouse Temp
+DeviceAddress probe2 = { 0x28, 0xFF, 0x7D, 0x65, 0x81, 0x14, 0x02, 0x7A };    // pot1 Temp
+DeviceAddress probe3 = { 0x28, 0xFF, 0xD2, 0x5C, 0x30, 0x17, 0x04, 0x62 };    // pot2
+DeviceAddress probe4 = { 0x28, 0xFF, 0xDB, 0x57, 0x81, 0x14, 0x02, 0x9A };    // pot3 Temp
+DeviceAddress probe5 = { 0x28, 0xFF, 0x7B, 0xF6, 0x80, 0x14, 0x02, 0x24 };    // pot4
 // 4 additional temperature probes
 DeviceAddress probe6 = { 0x28, 0xAA, 0x4B, 0x76, 0x53, 0x14, 0x01, 0xA3 };    // purge water temp
 DeviceAddress probe7 = { 0x28, 0xAA, 0x66, 0x74, 0x53, 0x14, 0x01, 0xB0 };    // greenhouse temp
@@ -130,8 +129,6 @@ void setup() {
   digitalWrite(pot4pin, OFF);
   pinMode(pot5pin, OUTPUT);                   // pin A4
   digitalWrite(pot5pin, OFF);
-  pinMode(runPin, OUTPUT);                    // Pin to indicate that the prgram is running
-  digitalWrite(runPin, LOW);
   pinMode(ventPin, OUTPUT);                   // pin 6
   digitalWrite(ventPin, OFF);
   pinMode(heatPin1, OUTPUT);                 // pin 3
@@ -163,7 +160,7 @@ void loop() {
   }
 
   receiveRPiData();
-
+  
   // check to see if it's time to water
   waterPots();
 
