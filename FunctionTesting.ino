@@ -57,7 +57,7 @@ void getTempsF(void){
 }
 
 void controlHouseVent(void){
-  int houseTemp   = greenHouseTemperatures[0];
+  int houseTemp   = greenHouseTemperatures[0];    // probe1
   if (houseTemp >= houseVentOnTemp){
     digitalWrite(heatPin1, OFF);
     digitalWrite(heatPin2, OFF);

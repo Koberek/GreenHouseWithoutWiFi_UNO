@@ -1,12 +1,13 @@
 
 //************************************************************************************************************
-// This TESTING ground is for program developement... Copying the most recent fully functional code and adding to it here
-// instead of breaking the perfectly good code already saved.
-
-// This program is derived from GreenHouseTesting with ALL references to WiFi removed. Function is the same
+// This program is forked from GreenHouseTesting. ALL references to WiFi removed. Function is the same
 // Instead of using NTP to get time, the time will be send from RPi via serial
 
 //************************************************************************************************************
+//  CURRENT WORK
+
+// 
+//*************************************************************************************************************
 // PINS>
 // 3,4    Heater (parallel circuit)
 // 5      Vent
@@ -56,7 +57,7 @@
 #define PROBE 0x01
 unsigned long PROBE_int = 60000;            // 1 minute read temp interval
 #define PRINT 0x02
-unsigned long PRINT_int = 2000;            // 2 sec print interval
+unsigned long PRINT_int = 10000;            // 2 sec print interval
 #define WATER 0x03
 unsigned long WATER_int = 120000;           // 2 minute watering DURATION timer. Water ON for 2 minutes
 #define RUNNING   0x04
