@@ -6,6 +6,9 @@
 //************************************************************************************************************
 //  CURRENT WORK
 
+// Moved printData() to (timer_lapsed(PROBE) == true)
+// Get probe temp data and print
+
 // 
 //*************************************************************************************************************
 // PINS>
@@ -57,7 +60,7 @@
 #define PROBE 0x01
 unsigned long PROBE_int = 60000;            // 1 minute read temp interval
 #define PRINT 0x02
-unsigned long PRINT_int = 10000;            // 2 sec print interval
+unsigned long PRINT_int = 10000;            // NOT USED. printData() is currently inside of timer_lapsed(PROBE)
 #define WATER 0x03
 unsigned long WATER_int = 120000;           // 2 minute watering DURATION timer. Water ON for 2 minutes
 #define RUNNING   0x04
@@ -168,6 +171,7 @@ void loop() {
   // get probe temps every PROBE_int
   if (timer_lapsed(PROBE) == true) {  // read temps every PROBE_int
     getTempsF();                      // This function take a LOT of time.. 830ms if using all 9 sensors!
+    printData();                      // print the TIME and temps
   }
 
   // Control the venting
@@ -177,7 +181,7 @@ void loop() {
   controlHouseHeater();               //  Heat if too cold
  
   if (timer_lapsed(PRINT) == true) {  // print Time and Temp data to Serial
-    printData();
+    //printData();
   }
 
 }
