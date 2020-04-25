@@ -117,6 +117,8 @@ DeviceAddress probe9 = { 0x28, 0xAA, 0x28, 0x7B, 0x53, 0x14, 0x01, 0x61 };    //
 uint8_t*    probeAddr[]  {probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9};     // indexes to each of the 8 temp probes
 bool        probeAvail[] {probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9};     // available YES NO
 int         greenHouseTemperatures [9];  // values from each of the 9 indexed probes (probe1...etc)
+int         greenhouseMaxTemp = 0;
+int         greenhouseMinTemp = 100;
 
 void setup() {
 
@@ -171,6 +173,7 @@ void loop() {
   // get probe temps every PROBE_int
   if (timer_lapsed(PROBE) == true) {  // read temps every PROBE_int
     getTempsF();                      // This function take a LOT of time.. 830ms if using all 9 sensors!
+    recordMinMax();                   // Record the daily Min and Max temps. Resets at midnight
     printData();                      // print the TIME and temps
   }
 

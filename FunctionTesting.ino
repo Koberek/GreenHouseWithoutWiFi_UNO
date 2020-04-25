@@ -56,6 +56,23 @@ void getTempsF(void){
 
 }
 
+void recordMinMax(void){
+  if ((UTC_hours == 0) && (UTC_hours == 0)){
+    //reset the MinMax temps at midnight
+    greenhouseMaxTemp = 0;
+    greenhouseMinTemp = 100;
+    return;
+  }
+  
+  int temp = greenHouseTemperatures[0];     // probe1
+  if (temp >= greenhouseMaxTemp){
+    greenhouseMaxTemp = temp;
+  }
+  if (temp <= greenhouseMinTemp){
+    greenhouseMinTemp = temp;
+  }
+}
+
 void controlHouseVent(void){
   int houseTemp   = greenHouseTemperatures[0];    // probe1
   if (houseTemp >= houseVentOnTemp){
@@ -165,6 +182,10 @@ void printData(void){
     Serial.print(greenHouseTemperatures[i]);
     Serial.print("     ");
   }
+    Serial.println();
+    Serial.print("MAX temp= "); Serial.println(greenhouseMaxTemp);
+    Serial.print("MIN temp= "); Serial.println(greenhouseMinTemp);
+    
     Serial.println();
     Serial.println();
 }
