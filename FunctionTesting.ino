@@ -167,9 +167,9 @@ void printData(void){
   else Serial.println("Venting  is OFF");
 
   if (heaterON == true) {
-    Serial.print("Heater   is ON..");
+    Serial.println("Heater   is ON");
     }
-  else Serial.println("Heater   is OFF..");
+  else Serial.println("Heater   is OFF");
 
   Serial.print("Temperature   ");  
   Serial.println("Probe1 Probe2 Probe3 Probe4 Probe5 ");

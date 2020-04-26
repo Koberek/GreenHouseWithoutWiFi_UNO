@@ -87,10 +87,10 @@ bool ventON         = false;
 bool  crcFAIL = false;                  // CRC used in serial communication with RPi.  NOT USED currently
 
 
-const int houseHeatOnTemp   = 45;
-const int houseHeatOffTemp  = 50;
-const int houseVentOnTemp   = 75;
-const int houseVentOffTemp  = 73;
+const int houseHeatOnTemp   = 60;
+const int houseHeatOffTemp  = 63;
+const int houseVentOnTemp   = 80;
+const int houseVentOffTemp  = 77;
 const int houseWARNTemp     = 90;
 
 // memory for communication from RPi
