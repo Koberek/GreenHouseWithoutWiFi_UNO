@@ -49,7 +49,7 @@ void receiveRPiData(void){
 void getTempsF(void){
 
   sensors.requestTemperatures();            // required before .getTempX()
-  for (int i=0; i<9; i++){                  // read all 8 temp sensors. Order of reading is fixed by DallasTemperature so be aware
+  for (int i=0; i<5; i++){                  // read all 5 temp sensors. Order of reading is fixed by DallasTemperature so be aware
   float temp = sensors.getTempF(probeAddr[i]);
   greenHouseTemperatures[i] = (int) temp;   // convert from float to int and store to greenHouseTemperature[]
   }
@@ -57,20 +57,26 @@ void getTempsF(void){
 }
 
 void recordMinMax(void){
-  if ((UTC_hours == 0) && (UTC_hours == 0)){
+  int temp;                                 // temperature data
+
+  if ((UTC_hours == 0) && (UTC_minutes == 0)){
     //reset the MinMax temps at midnight
-    greenhouseMaxTemp = 0;
-    greenhouseMinTemp = 100;
+    for (int i=0; i <5; i++){
+      greenhouseMaxTemp[i] = 0;
+      greenhouseMinTemp[i] = 100;
+    }
     return;
   }
-  
-  int temp = greenHouseTemperatures[0];     // probe1
-  if (temp >= greenhouseMaxTemp){
-    greenhouseMaxTemp = temp;
-  }
-  if (temp <= greenhouseMinTemp){
-    greenhouseMinTemp = temp;
-  }
+
+  for (int i=0; i<5; i++){
+    temp = greenHouseTemperatures[i];    // index to array
+    if (temp >= greenhouseMaxTemp[i]){
+      greenhouseMaxTemp[i] = temp;
+    }
+    if (temp <= greenhouseMinTemp[i]){
+      greenhouseMinTemp[i] = temp;
+    }
+    }
 }
 
 void controlHouseVent(void){
@@ -175,20 +181,35 @@ void printData(void){
   Serial.println("Probe1 Probe2 Probe3 Probe4 Probe5 ");
 
     
-  // print the temperatures
+  // print the current probe temperatures
   Serial.print("              ");
   for (int i=0; i<5; i++){
-
     Serial.print(greenHouseTemperatures[i]);
     Serial.print("     ");
   }
-    Serial.println();
-    Serial.print("MAX temp= "); Serial.println(greenhouseMaxTemp);
-    Serial.print("MIN temp= "); Serial.println(greenhouseMinTemp);
-    
-    Serial.println();
-    Serial.println();
+  
+  Serial.println();
+  // print the current MAX temps
+  Serial.print("MAX temp=");
+  Serial.print("     ");
+  for (int i=0; i<5; i++){
+    Serial.print(greenhouseMaxTemp[i]);
+    Serial.print("     ");
+  }
+
+  Serial.println();
+  // print the current MIN temps
+  Serial.print("MIN temp=");
+  Serial.print("     ");
+  for (int i=0; i<5; i++){
+    Serial.print(greenhouseMinTemp[i]);
+    Serial.print("     ");
+  }
+
+  Serial.println();
+  Serial.println();
 }
+
 
 // These are the system timers. Using millis() function. Each timer has a NAME_int to define the length of time in ms.
 // if current time - start time >= whatever_int then {}
