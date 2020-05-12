@@ -19,7 +19,7 @@ void receiveRPiData(void){
   
   if (inCount < 6) {
     return;
-    }     //return if less than 4 bytes are avaialable
+    }     //return if less than 6 (plus CR?) bytes are avaialable
   
   if (inCount > 6) { 
     Serial.println("Input Buffer Overflow in function receiveRPiData()");
@@ -27,17 +27,19 @@ void receiveRPiData(void){
     while (Serial.available()) {
       Serial.read();
     }
-    return;
+    return; // if 
   }
   
-  if (inCount == 6){    // read and store the buffr contents
+  if (inCount == 6){    // read and store the buffer contents
       for (int i=0; i < 6; i++){
       RPirecBlock[i]=Serial.read();
       }
   }
       
   if ((RPirecBlock[0] == 72) && (RPirecBlock[2] == 77) && (RPirecBlock[4] == 83)) {
-    // DATA block received verified. Adjust time
+    // IF Data received conforms to format HxMxSx... or 72-"H", 77="M" and 83="S"
+    // Is a verification of the received data
+    // DATA block received verified. Set Time.
     UTC_hours   = RPirecBlock[1];
     UTC_minutes = RPirecBlock[3];
     UTC_seconds = RPirecBlock[5];      
@@ -128,10 +130,10 @@ void waterPots(void){
     
     if ((waterON == true) && (wateringON == false)){        //waterON if inside watering window and wateringON is not active
         wateringON = true;                                  // wateringON is true when  watering is active
-          digitalWrite(pot1pin, ON);                        // turn watering valves ON
-          digitalWrite(pot2pin, ON);
-          digitalWrite(pot3pin, ON);
-          digitalWrite(pot4pin, ON);
+          digitalWrite(zone1pin, ON);                        // turn watering valves ON
+          digitalWrite(zone2pin, ON);
+          digitalWrite(zone3pin, ON);
+          digitalWrite(zone4pin, ON);
           
           
         WATER_lastRead_millis = millis();                   // init the wateringON timer start value
@@ -143,10 +145,10 @@ void waterPots(void){
       if (endwatering == true){
         waterON = false;                                    // reset the waterON to false
         wateringON = false;                                 // turn off watering
-          digitalWrite(pot1pin, OFF);
-          digitalWrite(pot2pin, OFF);
-          digitalWrite(pot3pin, OFF);
-          digitalWrite(pot4pin, OFF);
+          digitalWrite(zone1pin, OFF);
+          digitalWrite(zone2pin, OFF);
+          digitalWrite(zone3pin, OFF);
+          digitalWrite(zone4pin, OFF);
           
       }
     }

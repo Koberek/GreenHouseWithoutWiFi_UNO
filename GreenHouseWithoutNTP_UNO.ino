@@ -43,11 +43,11 @@
 #define ONE_WIRE_BUS 2                 // OneWire connected to pin2 on Uno
 #define TEMPERATURE_PRECISION 12       //Set precision of the 18B20's
 
-#define pot1pin   A0                   
-#define pot2pin   A1
-#define pot3pin   A2
-#define pot4pin   A3
-#define pot5pin   A4                  // not used
+#define zone1pin   A0                   
+#define zone2pin   A1
+#define zone3pin   A2
+#define zone4pin   A3
+#define flushpin   A4                  // not used
 #define ventPin   5
 #define heatPin1  3
 #define heatPin2  4
@@ -78,7 +78,7 @@ int UTC_minutes = 65;                    // same as above
 int UTC_seconds = 0;                     //
 
 
-int waterSchedule[]   {6,0,18,55};       // 24 hour clock. 0600 and 1400. Minutes are always 0 in waterPots()
+int waterSchedule[]   {6,0,18,55};       // 24 hour clock. {H,M,H,M.....}
 bool wateringON     = false;             // true if watering is active... i.e. water valves are open
 bool waterON        = false;             // true if it is time to water
 bool heaterON       = false;
@@ -117,31 +117,31 @@ DeviceAddress probe9 = { 0x28, 0xAA, 0x28, 0x7B, 0x53, 0x14, 0x01, 0x61 };    //
 uint8_t*    probeAddr[]  {probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9};     // indexes to each of the 8 temp probes
 bool        probeAvail[] {probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9};     // available YES NO
 int         greenHouseTemperatures [9];  // values from each of the 9 indexed probes (probe1...etc)
-int         greenhouseMaxTemp[5] = {0,0,0,0,0};
-int         greenhouseMinTemp[5] = {100,100,100,100,100};
+int         greenhouseMaxTemp[5] = {0,0,0,0,0};             // init to 0
+int         greenhouseMinTemp[5] = {100,100,100,100,100};   // init to 100
 
 void setup() {
 
   // Open serial communications
   Serial.begin(9600);
 
-  pinMode(pot1pin, OUTPUT);                   // pin A0 as GPIO OUTPUT
-  digitalWrite(pot1pin, OFF);
-  pinMode(pot2pin, OUTPUT);                   // pin A1
-  digitalWrite(pot2pin, OFF);
-  pinMode(pot3pin, OUTPUT);                   // pin A2
-  digitalWrite(pot3pin, OFF);
-  pinMode(pot4pin, OUTPUT);                   // pin A3
-  digitalWrite(pot4pin, OFF);
-  pinMode(pot5pin, OUTPUT);                   // pin A4
-  digitalWrite(pot5pin, OFF);
-  pinMode(ventPin, OUTPUT);                   // pin 6
+  pinMode(zone1pin, OUTPUT);                   // pin A0 as GPIO OUTPUT
+  digitalWrite(zone1pin, OFF);
+  pinMode(zone2pin, OUTPUT);                   // pin A1
+  digitalWrite(zone2pin, OFF);
+  pinMode(zone3pin, OUTPUT);                   // pin A2
+  digitalWrite(zone3pin, OFF);
+  pinMode(zone4pin, OUTPUT);                   // pin A3
+  digitalWrite(zone4pin, OFF);
+  pinMode(flushpin, OUTPUT);                   // pin A4
+  digitalWrite(flushpin, OFF);
+  pinMode(ventPin, OUTPUT);                    // pin 6
   digitalWrite(ventPin, OFF);
-  pinMode(heatPin1, OUTPUT);                 // pin 3
+  pinMode(heatPin1, OUTPUT);                   // pin 3
   digitalWrite(heatPin1, OFF);
-  pinMode(heatPin2, OUTPUT);                 // pin 4
+  pinMode(heatPin2, OUTPUT);                   // pin 4
   digitalWrite(heatPin2, OFF);
-  pinMode(LEDpin, OUTPUT);                    // pin 13
+  pinMode(LEDpin, OUTPUT);                     // pin 13
   digitalWrite(LEDpin, LOW);
 
   sensors.begin();    // Start Dallas 18B20 on oneWire
