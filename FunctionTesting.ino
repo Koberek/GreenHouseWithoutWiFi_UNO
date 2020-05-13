@@ -130,10 +130,10 @@ void waterPots(void){
     
     if ((waterON == true) && (wateringON == false)){        //waterON if inside watering window and wateringON is not active
         wateringON = true;                                  // wateringON is true when  watering is active
-          digitalWrite(zone1pin, ON);                        // turn watering valves ON
-          digitalWrite(zone2pin, ON);
-          digitalWrite(zone3pin, ON);
-          digitalWrite(zone4pin, ON);
+          digitalWrite(zone1WaterPin, ON);                        // turn watering valves ON
+          digitalWrite(zone2WaterPin, ON);
+          digitalWrite(zone3WaterPin, ON);
+          digitalWrite(zone4WaterPin, ON);
           
           
         WATER_lastRead_millis = millis();                   // init the wateringON timer start value
@@ -145,10 +145,10 @@ void waterPots(void){
       if (endwatering == true){
         waterON = false;                                    // reset the waterON to false
         wateringON = false;                                 // turn off watering
-          digitalWrite(zone1pin, OFF);
-          digitalWrite(zone2pin, OFF);
-          digitalWrite(zone3pin, OFF);
-          digitalWrite(zone4pin, OFF);
+          digitalWrite(zone1WaterPin, OFF);
+          digitalWrite(zone2WaterPin, OFF);
+          digitalWrite(zone3WaterPin, OFF);
+          digitalWrite(zone4WaterPin, OFF);
           
       }
     }

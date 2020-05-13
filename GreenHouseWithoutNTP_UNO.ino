@@ -7,7 +7,8 @@
 //  CURRENT WORK
 
 // Moved printData() to (timer_lapsed(PROBE) == true)
-// Get probe temp data and print
+// 
+// Change watering to 3 zone PLUS a flush
 
 // 
 //*************************************************************************************************************
@@ -29,10 +30,7 @@
 // IMPORTANT NOTES
 
 // SAMD5x can sink/sourse 8mA
-// Temp probes
-//    probe1-5 for the pots
-
-// Using analog pins A0-A4 for "waterPot1-Pot5"
+// Using analog pins A0-A4 for zone watering
 
 //************************************************************************************************************
 
@@ -43,15 +41,15 @@
 #define ONE_WIRE_BUS 2                 // OneWire connected to pin2 on Uno
 #define TEMPERATURE_PRECISION 12       //Set precision of the 18B20's
 
-#define zone1pin   A0                   
-#define zone2pin   A1
-#define zone3pin   A2
-#define zone4pin   A3
-#define flushpin   A4                  // not used
-#define ventPin   5
-#define heatPin1  3
-#define heatPin2  4
-#define LEDpin    13
+#define zone1WaterPin   A0                   
+#define zone2WaterPin   A1
+#define zone3WaterPin   A2
+#define zone4WaterPin   A3
+#define flushpin        A4                  // not used
+#define ventPin         5
+#define heatPin1        3
+#define heatPin2        4
+#define LEDpin          13
 
 #define OFF HIGH                          // Active LOW inputs on the external relay board
 #define ON  LOW                           // Active LOW inputs on the external relay board
@@ -125,14 +123,14 @@ void setup() {
   // Open serial communications
   Serial.begin(9600);
 
-  pinMode(zone1pin, OUTPUT);                   // pin A0 as GPIO OUTPUT
-  digitalWrite(zone1pin, OFF);
-  pinMode(zone2pin, OUTPUT);                   // pin A1
-  digitalWrite(zone2pin, OFF);
-  pinMode(zone3pin, OUTPUT);                   // pin A2
-  digitalWrite(zone3pin, OFF);
-  pinMode(zone4pin, OUTPUT);                   // pin A3
-  digitalWrite(zone4pin, OFF);
+  pinMode(zone1WaterPin, OUTPUT);                   // pin A0 as GPIO OUTPUT
+  digitalWrite(zone1WaterPin, OFF);
+  pinMode(zone2WaterPin, OUTPUT);                   // pin A1
+  digitalWrite(zone2WaterPin, OFF);
+  pinMode(zone3WaterPin, OUTPUT);                   // pin A2
+  digitalWrite(zone3WaterPin, OFF);
+  pinMode(zone4WaterPin, OUTPUT);                   // pin A3
+  digitalWrite(zone4WaterPin, OFF);
   pinMode(flushpin, OUTPUT);                   // pin A4
   digitalWrite(flushpin, OFF);
   pinMode(ventPin, OUTPUT);                    // pin 6
